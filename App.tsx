@@ -72,13 +72,7 @@ export default function App() {
       marginRight: 20,
       color: '#000',
     },
-    temaInput: {
-      fontSize: 15,
-      marginRight: 20,
-      backgroundColor: 'yellow',
-      width: '50%',
-      color: '#000',
-    },
+    
     temaTitle: {
       fontSize: 25,
       color: '#000',
@@ -89,7 +83,7 @@ export default function App() {
       backgroundColor: '#aaa',
       color: '#000',
       padding: 10,
-      marginBottom: 10,
+      margin: 30,
     },
     nota : {
       fontSize: 16,
@@ -113,16 +107,16 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.temaTitle}>Anotações Gerais</Text>
+      <Text style={styles.temaTitle}>Meus Streams favoritos</Text>
       <TextInput
         style={styles.entrada}
-        placeholder='Digite sua anotação'
+        placeholder='Digite o nome do stream'
         placeholderTextColor={"#000"}
         value={anotacao}
         onChangeText={setAnotacao}
       />
       <Button
-        title='Adicionar nota'
+        title='Adicionar stream'
         onPress={adicionarStream}
       />
 
@@ -132,10 +126,10 @@ export default function App() {
         renderItem={({ item }) => (
           <View>
             <Text style={styles.nota}>
-              {item.id}
+              {item.titulo}
             </Text>
             <Text style={styles.data}>
-              {item.titulo}
+              {item.id}
             </Text>
           </View>
         )}
@@ -144,7 +138,7 @@ export default function App() {
       <Pressable 
         onPress={excluirStream}
         style={styles.botao}>
-        <Text>Apagar Notas</Text>
+        <Text>Apagar Streams</Text>
       </Pressable>
 
     </View>
