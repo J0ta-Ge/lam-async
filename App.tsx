@@ -38,7 +38,6 @@ export default function App() {
     }
   };
 
-  // Exclui apenas o stream selecionado
   const excluirStream = async (id: string) => {
     try {
       const newStreams = stream.filter((item) => item.id !== id);
@@ -54,7 +53,6 @@ export default function App() {
     }
   };
 
-  // Exclui todos os streams
   const excluirTodosStreams = async () => {
     try {
       await AsyncStorage.removeItem('@streams');
@@ -130,7 +128,6 @@ export default function App() {
       color: '#555',
     },
 
-    // Container de cada item da lista
     itemContainer: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -140,7 +137,6 @@ export default function App() {
       marginBottom: 10,
     },
 
-    // Área clicável do ícone
     botaoLixeira: {
       padding: 8,
     },
