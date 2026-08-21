@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, Pressable, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
 type Stream = {
   id: string;
@@ -13,7 +14,7 @@ export default function App() {
   const [stream, setStream] = useState<Stream[]>([]);
   const [anotacao, setAnotacao] = useState('');
 
-  useEffect(() =>{
+  useEffect(() => {
     carregarStreams();
   }, []);
 
@@ -21,37 +22,64 @@ export default function App() {
     try {
       await AsyncStorage.setItem('@streams', JSON.stringify(newStreams));
     } catch (error) {
-      console.log('Erro ao salvar streams', error)
+      console.log('Erro ao salvar streams', error);
     }
   };
 
   const carregarStreams = async () => {
     try {
       const stored = await AsyncStorage.getItem('@streams');
+
       if (stored) {
-        setStream(JSON.parse(stored) as Stream[])
+        setStream(JSON.parse(stored) as Stream[]);
       }
     } catch (error) {
-      console.log('Erro ao carregar streams', error)
+      console.log('Erro ao carregar streams', error);
     }
   };
 
-  const excluirStream = async () => {
-    await AsyncStorage.removeItem('@streams');
-    setStream([]);
-  }
+  // Exclui apenas o stream selecionado
+  const excluirStream = async (id: string) => {
+    try {
+      const newStreams = stream.filter((item) => item.id !== id);
+
+      setStream(newStreams);
+
+      await AsyncStorage.setItem(
+        '@streams',
+        JSON.stringify(newStreams)
+      );
+    } catch (error) {
+      console.log('Erro ao excluir stream', error);
+    }
+  };
+
+  // Exclui todos os streams
+  const excluirTodosStreams = async () => {
+    try {
+      await AsyncStorage.removeItem('@streams');
+      setStream([]);
+    } catch (error) {
+      console.log('Erro ao excluir streams', error);
+    }
+  };
 
   const adicionarStream = () => {
-    if(anotacao.trim().length > 0){
+    if (anotacao.trim().length > 0) {
+
       const newStreams: Stream[] = [
         ...stream,
-        { id: Date.now().toString(), titulo: anotacao }
+        {
+          id: Date.now().toString(),
+          titulo: anotacao
+        }
       ];
+
       setStream(newStreams);
       salvarStreams(newStreams);
       setAnotacao('');
     }
-  }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -62,21 +90,24 @@ export default function App() {
       marginBottom: 20,
       backgroundColor: '#fff',
     },
+
     temaContainer: {
       flexDirection: 'row',
       alignContent: 'center',
       margin: 10,
     },
+
     temaText: {
       fontSize: 15,
       marginRight: 20,
       color: '#000',
     },
-    
+
     temaTitle: {
       fontSize: 25,
       color: '#000',
     },
+
     entrada: {
       borderWidth: 1,
       borderColor: '#333',
@@ -85,17 +116,35 @@ export default function App() {
       padding: 10,
       margin: 30,
     },
-    nota : {
+
+    nota: {
       fontSize: 16,
       padding: 6,
       borderBottomColor: '#ccc',
       borderBottomWidth: 1,
       color: '#000',
     },
+
     data: {
       fontSize: 12,
       color: '#555',
     },
+
+    // Container de cada item da lista
+    itemContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+      paddingHorizontal: 10,
+      marginBottom: 10,
+    },
+
+    // Área clicável do ícone
+    botaoLixeira: {
+      padding: 8,
+    },
+
     botao: {
       backgroundColor: 'yellow',
       padding: 15,
@@ -107,16 +156,21 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.temaTitle}>Meus Streams favoritos</Text>
+
+      <Text style={styles.temaTitle}>
+        Meus Streams favoritos
+      </Text>
+
       <TextInput
         style={styles.entrada}
-        placeholder='Digite o nome do stream'
-        placeholderTextColor={"#000"}
+        placeholder="Digite o nome do stream"
+        placeholderTextColor="#000"
         value={anotacao}
         onChangeText={setAnotacao}
       />
+
       <Button
-        title='Adicionar stream'
+        title="Adicionar stream"
         onPress={adicionarStream}
       />
 
@@ -124,20 +178,37 @@ export default function App() {
         data={stream}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View>
-            <Text style={styles.nota}>
-              {item.titulo}
-            </Text>
-            <Text style={styles.data}>
-              {item.id}
-            </Text>
+          <View style={styles.itemContainer}>
+
+            <View>
+              <Text style={styles.nota}>
+                {item.titulo}
+              </Text>
+
+              <Text style={styles.data}>
+                {item.id}
+              </Text>
+            </View>
+
+            <Pressable
+              style={styles.botaoLixeira}
+              onPress={() => excluirStream(item.id)}
+            >
+              <Ionicons
+                name="trash-outline"
+                size={24}
+                color="red"
+              />
+            </Pressable>
+
           </View>
         )}
       />
 
-      <Pressable 
-        onPress={excluirStream}
-        style={styles.botao}>
+      <Pressable
+        onPress={excluirTodosStreams}
+        style={styles.botao}
+      >
         <Text>Apagar Streams</Text>
       </Pressable>
 
